@@ -1,0 +1,5 @@
+rvm use 2.0.0@solrclient --create
+
+if ! command -v bundle ; then
+  gem install bundler
+fi

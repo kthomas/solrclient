@@ -1,0 +1,43 @@
+= SolrClient
+
+Lightweight HTTP JSON client for indexing and querying data in Solr collections.
+
+Plays well with Solr 3.6 and Solr 4.4.x.
+
+
+= Installation
+
+    gem 'solrclient', git: 'https://github.com/kthomas/solrclient'
+
+
+= Usage
+
+Indexing:
+------------------------
+
+     require 'solrclient'
+	
+     solr_client = SolrClient.new('solr.example.com', 'collection1') # defaults port to 8983 without SSL
+	
+     params = {
+      id: 'some-id',
+      name_t: 'the name', # dynamic text field, provided your schema.xml defines *_t
+      make_s: 'Honda', # dynamic string field, provided your schema.xml defines *_s
+    }
+
+	
+Response Handling
+------------------------
+
+1. Synchronously retrieve the entire response object:
+
+    response = solr_client.index params
+    do_something if response.code == '200'
+	
+2. Pass a block and expect parsed JSON:
+
+    solr_client.query params do |response|
+      response[:response][:docs].each do |document|
+        # do something
+      end
+    end
