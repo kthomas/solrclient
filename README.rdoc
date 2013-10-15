@@ -17,7 +17,7 @@ Indexing:
 
      require 'solrclient'
 	
-     solr_client = SolrClient.new('solr.example.com', 'collection1') # defaults port to 8983 without SSL
+     solr_client = SolrClient::Collection.new('solr.example.com', 'collection1') # defaults port to 8983 without SSL
 	
      params = {
       id: 'some-id',

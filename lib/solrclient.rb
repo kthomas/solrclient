@@ -30,7 +30,7 @@ module SolrClient
     # 
     #
     def query params = {}
-      response = http_client.get('select', params)
+      response = http_client.get('/select', params)
       yield JSON.parse(response.body) if response.code == 200.to_s
       response
     end
@@ -39,9 +39,9 @@ module SolrClient
     # Index a document in the Solr collection
     # 
     #
-    def index params = {}
-      response = http_client.post('update/json', {
-        add: params.to_json
+    def index document = {}
+      response = http_client.post('/update/json', {
+        add: document
       })
       yield JSON.parse(response.body) if block_given? && response.code == 200.to_s
       response
@@ -69,7 +69,7 @@ module SolrClient
     # 
     #
     def delete document_id
-      http_client.post('update/json', {
+      http_client.post('/update/json', {
         delete: {
           id: document_id
         }

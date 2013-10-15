@@ -13,6 +13,8 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,db,lib}/**/*'] + ['Rakefile', 'README.rdoc']
 
+  s.add_dependency 'persistent_http'
+
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'rspec'
