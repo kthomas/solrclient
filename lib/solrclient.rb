@@ -38,10 +38,16 @@ module SolrClient
     # 
     # Index a document in the Solr collection
     # 
+    # params can inlude any of the following:
+    #   boost: 1
+    #   commitWithin: 1000
+    #   overwrite: true
     #
-    def index document = {}
-      response = http_client.post('/update/json', {
-        add: document
+    def index document = {}, params = {}
+      response = http_client.post('/update?wt=json', {
+        add: {
+          doc: document
+        }.merge(params)
       })
       yield JSON.parse(response.body) if block_given? && response.code == 200.to_s
       response
@@ -69,7 +75,7 @@ module SolrClient
     # 
     #
     def delete document_id
-      http_client.post('/update/json', {
+      http_client.post('/update?wt=json', {
         delete: {
           id: document_id
         }
