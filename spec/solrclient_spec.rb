@@ -37,11 +37,11 @@ describe SolrClient do
 
       it 'should return true if the document was successfully deleted' do
         HttpClient.any_instance.stubs(:post).returns(OpenStruct.new(code: '200', body: '{}'))
-        collection.delete('123').should be_true
+        collection.delete({id: '123'}).should be_true
       end
 
     end
-    
+
   end
 
 end

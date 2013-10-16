@@ -59,28 +59,30 @@ module SolrClient
     # Update a document in the Solr collection;
     # this is a convenience method and provides
     # parity to calling #delete and #index; the
-    # given params hash must contain the unique
-    # identifier for the document as params[:id]
+    # given document hash must contain the unique
+    # identifier for the document as document[:id]
     # 
     #
-    def update params = {}
-      if delete(params[:id])
-        response = index(params)
-        yield JSON.parse(response.body) if block_given? && response.code == 200.to_s
-        response
+    def update document = {}, params = {}
+      unless document[:id].nil? || document[:id].match(/^\*/i)
+        delete('id:' + document[:id])
       end
+
+      response = index(document, params)
+      yield JSON.parse(response.body) if block_given? && response.code == 200.to_s
+      response
     end
     
     # 
-    # Remove a single document from the Solr
-    # collection given its unique identifier
+    # Remove one or more documents from the Solr
+    # collection given a valid Solr query string
     # 
     #
-    def delete document_id
+    def delete solr_query
       uri = uri_by_appending('update')
       http_client.post(uri + '?wt=json', {
         delete: {
-          id: document_id
+          query: solr_query
         }
       }).code == 200.to_s
     end
