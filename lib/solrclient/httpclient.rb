@@ -28,13 +28,12 @@ class HttpClient
     
   end
 
-  def initialize hostname, port, uri = nil, use_ssl = false
-    base_url = 'http' + (use_ssl ? 's://' : '://') + hostname + ':' + port.to_s + (uri.nil? ? '' : '/' + uri.gsub(/(^\/+)(.*)/, '\2'))
+  def initialize hostname, port, use_ssl = false
     @connection_pool = PersistentHTTP.new(
         name: 'SolrClient-' + Time.now.to_i.to_s,
         pool_size: 10,
         pool_timeout: 30,
-        url: base_url
+        url: 'http' + (use_ssl ? 's://' : '://') + hostname + ':' + port.to_s
     )
   end
 
@@ -46,14 +45,14 @@ class HttpClient
 
   def post uri, params
     request = Net::HTTP::Post::new(uri)
-    request.body = params.to_json
+    request.body = params.to_json.to_s
     request.add_field('content-type', 'application/json')
     @connection_pool.request(request)
   end
 
   def put uri, params
     request = Net::HTTP::Put::new(uri)
-    request.body = params.to_json
+    request.body = params.to_json.to_s
     request.add_field('content-type', 'application/json')
     @connection_pool.request(request)
   end

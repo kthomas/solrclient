@@ -4,10 +4,9 @@ describe HttpClient do
 
   let(:hostname) { 'ec2-54-242-203-240.compute-1.amazonaws.com' }
   let(:port)     { 8983 }
-  let(:uri)      { nil }
   let(:use_ssl)  { false }
 
-  let(:httpclient) { HttpClient.new hostname, port, uri, use_ssl }
+  let(:httpclient) { HttpClient.new hostname, port, use_ssl }
 
   context '#get' do
 

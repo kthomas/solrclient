@@ -5,10 +5,6 @@ describe SolrClient do
   describe SolrClient::Collection do
   
     let(:collection) { SolrClient::Collection.new 'example.com', 'collection1', 8080 }
-  
-    before do
-    
-    end
 
     context '#query' do
 

@@ -30,24 +30,26 @@ module SolrClient
     # 
     #
     def query params = {}
-      response = http_client.get('/select', params)
+      uri = uri_by_appending('select')
+      response = http_client.get(uri, params)
       yield JSON.parse(response.body) if response.code == 200.to_s
       response
     end
     
     # 
     # Index a document in the Solr collection
-    # 
-    # params can inlude any of the following:
-    #   boost: 1
-    #   commitWithin: 1000
-    #   overwrite: true
+    #
+    # params may include any of the following
+    # in addition to the "doc":
+    #   "boost":1.0
+    #   "overwrite":true
+    #   "commitWithin":1000 (millis)
     #
     def index document = {}, params = {}
-      response = http_client.post('/update?wt=json', {
-        add: {
-          doc: document
-        }.merge(params)
+      params[:doc] = document
+      uri = uri_by_appending('update')
+      response = http_client.post(uri + '?wt=json', {
+        add: params
       })
       yield JSON.parse(response.body) if block_given? && response.code == 200.to_s
       response
@@ -75,7 +77,8 @@ module SolrClient
     # 
     #
     def delete document_id
-      http_client.post('/update?wt=json', {
+      uri = uri_by_appending('update')
+      http_client.post(uri + '?wt=json', {
         delete: {
           id: document_id
         }
@@ -86,8 +89,12 @@ module SolrClient
     
     def http_client
       @http_client ||= begin
-        @http_client = HttpClient.new(@hostname, @port, @collection_name, @use_ssl)
+        @http_client = HttpClient.new(@hostname, @port, @use_ssl)
       end
+    end
+
+    def uri_by_appending path
+      '/' + @collection_name + '/' + path.gsub(/(^\/+)(.*)/, '\2')
     end
     
   end
