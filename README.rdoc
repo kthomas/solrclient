@@ -9,6 +9,22 @@ Plays well with Solr 3.6 and Solr 4.4.x.
 
     gem 'solrclient', git: 'https://github.com/kthomas/solrclient'
 
+= Quick Start
+
+1. There is a client API entry point where the solr and zookeeper stuff live
+
+2. The cheapest integration involves using the SolrClientApi like:
+
+    api_client = SolrClientApi.new('solr.example.com', 
+                                   'recommendations')
+								   
+    api_client.solr_client.index({id: 'bi-dealership-id', type: 'dealership', make_s: 'Benz', comment_s: 'test 123'})
+	
+	# solr query syntax
+    api_client:solr_client.delete('id:bi-dealership-id') 
+	# the id field is not a unique constraint in solrconfig.xml	
+	
+    api_client.truncate_index!
 
 = Usage
 
@@ -41,3 +57,4 @@ Response Handling
         # do something
       end
     end
+

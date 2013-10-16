@@ -30,9 +30,9 @@ class HttpClient
 
   def initialize hostname, port, use_ssl = false
     @connection_pool = PersistentHTTP.new(
-        name: 'SolrClient-' + Time.now.to_i.to_s,
+        name: 'HttpClientConnectionPool-' + Time.now.to_i.to_s,
         pool_size: 10,
-        pool_timeout: 30,
+        pool_timeout: 300,
         url: 'http' + (use_ssl ? 's://' : '://') + hostname + ':' + port.to_s
     )
   end

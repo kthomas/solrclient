@@ -2,7 +2,31 @@
 require 'solrclient/httpclient'
 
 #
-# Solr client
+# Solr client usage:
+#
+# index a document:
+# response = solr_client.index({id: 'bi-dealership-id', type: 'dealership', comment_s: 'test 123'})
+# if response.code == '200'
+#     puts 'Indexed document...'
+#     # delete that same document:
+#     if solr_client.delete('id:bi-dealership-id AND type:dealership') # Solr query syntax
+#         puts 'Deleted document with id: bi-dealership-id'
+#     else
+#         puts 'Failed to delete document with id: bi-dealership-id'
+#     end
+# end
+# 
+# # index a document and require it to be written to the index within 5 seconds:
+# response = solr_client.index({id: 'bi-dealership-id-2', type: 'dealership', comment_s: 'test 456'}, {commitWithin: 5000})
+# if response.code == '200'
+#     puts 'Indexed document'
+#     if solr_client.delete('id:bi-dealership-id-2 AND type:dealership') # Solr-style query syntax for deleting documents
+#         puts 'Deleted document with id: asdfasdfasdf'
+#     else
+#         puts 'Failed to delete document with id: asdfasdfasdf'
+#     end
+# end 
+# 
 #
 # TODO: write a method to destroy/cleanup the pooled Http connections
 #
