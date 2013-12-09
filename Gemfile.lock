@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    solrclient (0.0.2)
+    solrclient (0.0.1)
       persistent_http
 
 GEM
