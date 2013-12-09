@@ -12,6 +12,13 @@ describe SolrClient do
         HttpClient.any_instance.stubs(:get).returns(OpenStruct.new(code: '200', body: '{}'))
         expect { |onsuccess| collection.query({}, &onsuccess) }.to yield_with_args({})
       end
+      
+      # it 'should invoke the Yahoo! geocoding API if a zipcode is provided' do
+      #   HttpClient.any_instance.stubs(:get).with('/select').returns(OpenStruct.new(code: '200', body: '{}'))
+      #   HttpClient.any_instance.stubs(:get).with('/v1/places.q(\'30328\')').returns(OpenStruct.new(code: '200', body: '{latitude: 33.93457, longitude: -84.395668}'))
+      #   
+      #   expect { |onsuccess| collection.query({zip: '30328'}, &onsuccess) }.to yield_with_args({})
+      # end
 
     end
 

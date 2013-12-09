@@ -55,8 +55,39 @@ module SolrClient
     #
     def query params = {}
       uri = uri_by_appending('select')
-      response = http_client.get(uri, params)
-      yield JSON.parse(response.body) if response.code == 200.to_s
+
+      query_params = {
+          q: (params[:q] || '*:*'),
+          wt: 'json'
+      }
+
+      coordinates = params[:coordinates] || begin
+        unless params[:zip].nil?
+          query_params[:pt] = params[:pt] || begin
+            coordinates = coordinates_from_zip params[:zip]
+            "#{coordinates['latitude']},#{coordinates['longitude']}"
+          rescue
+            raise ArgumentError
+          end
+        end
+      end
+
+      unless coordinates.nil?
+        query_params[:sfield] = params[:sfield] || 'coordinates'
+        query_params[:fq] = params[:fq] || '{!geofilt}'
+        query_params[:pt] = "#{coordinates[:latitude]},#{coordinates[:longitude]}"
+        query_params[:sort] = params[:sort] || "geodist(#{query_params[:sfield]}, #{coordinates[:latitude]}, #{coordinates[:longitude]}) asc"
+
+        unless params[:radius].nil?
+          raise ArgumentError if params[:radius].to_i <= 0
+          query_params[:d] = params[:radius].to_i * 1.60934 # conversion to km
+        end
+      end
+
+      query_params[:timeAllowed] = params[:time_allowed] unless params[:time_allowed].nil?
+
+      response = http_client.get(uri, query_params)
+      yield JSON.parse(response.body) if block_given? && response.code == 200.to_s
       response
     end
     
@@ -113,16 +144,44 @@ module SolrClient
     
     private
     
+    def uri_by_appending path
+      '/' + @collection_name + '/' + path.gsub(/(^\/+)(.*)/, '\2')
+    end
+    
     def http_client
       @http_client ||= begin
         @http_client = HttpClient.new(@hostname, @port, @use_ssl)
       end
     end
-
-    def uri_by_appending path
-      '/' + @collection_name + '/' + path.gsub(/(^\/+)(.*)/, '\2')
+    
+    def geocoding_http_client
+      @geocoding_http_client ||= begin
+        @geocoding_http_client = HttpClient.new('where.yahooapis.com', 80)
+      end
     end
     
+    def coordinates_from_zip zip
+      yahoo_geoplanet_appid = ENV['GEOPLANET_APP_ID']
+      unless yahoo_geoplanet_appid.nil?
+        geocoding_uri = "/v1/places.q('#{zip}')"
+
+        params = {
+          appid: yahoo_geoplanet_appid,
+          format: 'json'
+        }
+
+        api_response = geocoding_http_client.get geocoding_uri, params
+        coordinates = nil
+        if !api_response.nil? && api_response.code.to_i == 200
+          response = JSON.parse(api_response.body)
+          if response['places']['count'] > 0
+            coordinates = response['places']['place'][0]['centroid']
+          end
+        end
+        coordinates
+      end
+    end
+
   end
 
 end
